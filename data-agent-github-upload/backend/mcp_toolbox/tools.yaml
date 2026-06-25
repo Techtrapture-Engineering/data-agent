@@ -1,0 +1,62 @@
+sources:
+  my-mongodb:
+    kind: mongodb
+    uri: "mongodb+srv://dataagent:yourpassword123@data-agent-cluster.lllnzdv.mongodb.net/?appName=data-agent-cluster
+"
+
+tools:
+  find_orders:
+    kind: mongodb-find
+    source: my-mongodb
+    description: Find documents from the sales_db.orders collection using a flexible filter.
+    database: sales_db
+    collection: orders
+    limit: 10
+    filterPayload: |
+      {
+        "region": {{ json .region }}
+      }
+    filterParams:
+      - name: region
+        type: string
+        description: Region to filter orders by, for example India or USA.
+
+  find_one_order_by_customer:
+    kind: mongodb-find-one
+    source: my-mongodb
+    description: Find one order by customer name from sales_db.orders.
+    database: sales_db
+    collection: orders
+    filterPayload: |
+      {
+        "customer": {{ json .customer }}
+      }
+    filterParams:
+      - name: customer
+        type: string
+        description: Customer name.
+
+  aggregate_sales_by_region:
+    kind: mongodb-aggregate
+    source: my-mongodb
+    description: Calculate total sales amount grouped by region from sales_db.orders.
+    database: sales_db
+    collection: orders
+    readOnly: true
+    pipelinePayload: |
+      [
+        {
+          "$group": {
+            "_id": "$region",
+            "total_sales": { "$sum": "$amount" },
+            "order_count": { "$sum": 1 }
+          }
+        }
+      ]
+    pipelineParams: []
+
+toolsets:
+  mongodb-toolset:
+    - find_orders
+    - find_one_order_by_customer
+    - aggregate_sales_by_region
