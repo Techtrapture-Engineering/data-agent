@@ -1,8 +1,7 @@
 sources:
   my-mongodb:
     kind: mongodb
-    uri: "mongodb+srv://dataagent:yourpassword123@data-agent-cluster.lllnzdv.mongodb.net/?appName=data-agent-cluster
-"
+    uri: "uri: "mongodb+srv://dataagent:<PASSWORD>@data-agent-cluster.lllnzdv.mongodb.net/?appName=data-agent-cluster"
 
 tools:
   find_orders:
