@@ -179,11 +179,3 @@ python backend/main.py
 * Schema understanding
 * Cross-database querying
 * Automated reporting
-
-## Author
-
-Diya
-
-## License
-
-MIT License
