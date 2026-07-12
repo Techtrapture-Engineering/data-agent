@@ -1,0 +1,78 @@
+sources:
+  my-neo4j:
+    kind: neo4j
+    uri: "${NEO4J_URI}"
+    user: "${NEO4J_USERNAME}"
+    password: "${NEO4J_PASSWORD}"
+    database: "${NEO4J_DATABASE}"
+
+tools:
+  get_graph_schema:
+    kind: neo4j-schema
+    source: my-neo4j
+    description: |
+      Retrieve the complete Neo4j graph schema, including node labels,
+      relationship types, properties, indexes, and constraints.
+      Use this before generating Cypher for an unfamiliar database.
+    cacheExpireMinutes: 30
+
+  list_node_labels:
+    kind: neo4j-cypher
+    source: my-neo4j
+    description: |
+      List all node labels available in the connected Neo4j database.
+      Use this to discover the kinds of entities stored in the graph.
+    statement: |
+      CALL db.labels() YIELD label
+      RETURN label
+      ORDER BY label;
+
+  list_relationship_types:
+    kind: neo4j-cypher
+    source: my-neo4j
+    description: |
+      List all relationship types available in the connected Neo4j database.
+    statement: |
+      CALL db.relationshipTypes() YIELD relationshipType
+      RETURN relationshipType
+      ORDER BY relationshipType;
+
+  sample_graph:
+    kind: neo4j-cypher
+    source: my-neo4j
+    description: |
+      Return a small sample of nodes and relationships from the graph.
+      Use this to understand how the graph data is structured.
+    statement: |
+      MATCH (source)-[relationship]->(target)
+      RETURN
+        labels(source) AS source_labels,
+        properties(source) AS source_properties,
+        type(relationship) AS relationship_type,
+        properties(relationship) AS relationship_properties,
+        labels(target) AS target_labels,
+        properties(target) AS target_properties
+      LIMIT 10;
+
+  execute_readonly_cypher:
+    kind: neo4j-execute-cypher
+    source: my-neo4j
+    description: |
+      Execute a read-only Cypher query against the Neo4j database.
+
+      First use get_graph_schema to understand available labels,
+      properties, and relationships. Generate only read operations such as
+      MATCH, OPTIONAL MATCH, WHERE, WITH, RETURN, UNWIND, and CALL for
+      read-only procedures.
+
+      Never generate CREATE, MERGE, SET, DELETE, DETACH DELETE, DROP,
+      REMOVE, or other write operations.
+    readOnly: true
+
+toolsets:
+  neo4j-toolset:
+    - get_graph_schema
+    - list_node_labels
+    - list_relationship_types
+    - sample_graph
+    - execute_readonly_cypher

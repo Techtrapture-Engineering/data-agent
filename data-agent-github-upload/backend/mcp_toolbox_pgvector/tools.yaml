@@ -1,0 +1,75 @@
+sources:
+  my-postgres-vector:
+    kind: postgres
+    host: 35.192.44.229
+    port: 5432
+    database: vector_db
+    user: postgres
+    password: Ruby7*ruby
+
+tools:
+  list_tables:
+    kind: postgres-sql
+    source: my-postgres-vector
+    description: List all tables in the public schema.
+    statement: |
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
+      ORDER BY table_name;
+
+  list_vector_columns:
+    kind: postgres-sql
+    source: my-postgres-vector
+    description: List all tables and columns that use the pgvector vector type.
+    statement: |
+      SELECT table_name, column_name, udt_name
+      FROM information_schema.columns
+      WHERE udt_name = 'vector'
+      ORDER BY table_name, column_name;
+
+  describe_table:
+    kind: postgres-sql
+    source: my-postgres-vector
+    description: Describe columns of a specific table. Use this before querying a user's vector table.
+    parameters:
+      - name: table_name
+        type: string
+        description: Name of the table to describe.
+    statement: |
+      SELECT column_name, data_type, udt_name
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name = $1
+      ORDER BY ordinal_position;
+
+  list_table_rows:
+    kind: postgres-sql
+    source: my-postgres-vector
+    description: List rows from a selected table for preview.
+    parameters:
+      - name: table_name
+        type: string
+        description: Name of the table to preview.
+    statement: |
+      SELECT *
+      FROM public.$1
+      LIMIT 10;
+
+  similarity_search_documents:
+    kind: postgres-sql
+    source: my-postgres-vector
+    description: Run pgvector similarity search on the current demo documents table.
+    statement: |
+      SELECT id, title, content
+      FROM documents
+      ORDER BY embedding <-> '[0.1,0.2,0.25]'
+      LIMIT 2;
+
+toolsets:
+  pgvector-toolset:
+    - list_tables
+    - list_vector_columns
+    - describe_table
+    - list_table_rows
+    - similarity_search_documents
