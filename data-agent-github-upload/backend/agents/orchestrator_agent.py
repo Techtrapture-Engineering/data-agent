@@ -5,6 +5,7 @@ from .cloudsql_agent import cloudsql_agent
 from .mongodb_agent import mongodb_agent
 from backend.agents.pgvector_agent import pgvector_agent
 from backend.agents.neo4j_agent import neo4j_agent
+from backend.agents.github_agent import github_agent
 
 orchestrator_agent = LlmAgent(
     name="orchestrator_agent",
@@ -27,7 +28,8 @@ orchestrator_agent = LlmAgent(
     Use mongodb_agent for MongoDB collections, documents, find queries, and aggregation.
     Use pgvector_agent for vector database, embeddings, semantic search, similarity search, or pgvector questions.
     Use neo4j_agent for Neo4j graph database, graph schema, node labels, relationship types, sample nodes, and Cypher-related graph questions.
-    
+    Use github_agent for GitHub repositories, issues, pull requests, and GitHub API questions.
+
     If unclear, ask one short clarification question.
     Route the request once to the correct specialist.
     Do not repeatedly transfer between agents.
@@ -40,5 +42,6 @@ orchestrator_agent = LlmAgent(
         mongodb_agent,
         pgvector_agent,
         neo4j_agent,
+        github_agent,
     ],
 )
